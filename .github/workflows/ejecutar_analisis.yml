@@ -1,0 +1,40 @@
+name: Ejecutar Analisis Biogeoquimico
+
+on:
+  push:
+    branches: [ main ]  # Se ejecuta automáticamente cada vez que subes cambios
+  workflow_dispatch:     # Te permite ejecutarlo manualmente desde la web de GitHub
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Copiar el código del repositorio al servidor virtual de GitHub
+    - name: Checkout del repositorio
+      uses: actions/checkout@v4
+
+    # 2. Configurar el entorno de Python
+    - name: Configurar Python
+      uses: actions/setup-python@v5
+      with:
+        python-node: '3.10'
+
+    # 3. Instalar las librerías necesarias
+    - name: Instalar dependencias
+      run: |
+        python -m pip install --upgrade pip
+        pip install h5py numpy pandas matplotlib xarray netcdf4
+
+    # 4. Ejecutar tu script de Python
+    - name: Ejecutar Script de Análisis
+      run: python analizar_datos.py
+
+    # 5. Guardar los gráficos y archivos CSV generados para que puedas descargarlos
+    - name: Guardar Resultados (Gráficos y CSV)
+      uses: actions/upload-artifact@v4
+      with:
+        name: resultados-clorofila
+        path: |
+          *.png
+          *.csv
